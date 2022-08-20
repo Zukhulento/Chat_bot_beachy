@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- CSS only -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx"
+      crossorigin="anonymous"
+    />
+    <!-- JavaScript Bundle with Popper -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+      crossorigin="anonymous"
+    ></script>
+    <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <link rel="stylesheet" href="style.css" />
+    <script>src="main.js" </script>
+    <title>Chatbot</title>
+  </head>
+    <nav class="navbar navbar-expand-lg bg-dark">
+<body>
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+          <img
+            src="Img/Z.png"
+            alt=""
+            width="30"
+            height="24"
+            class="d-inline-block align-text-top"
+          />
+          BEACHY
+        </a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Qquienes somos?</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Ropa
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Gorras</a></li>
+                <li><a class="dropdown-item" href="#">Camisas</a></li>
+              </ul>
+            </li>
+          </ul>
+          <form class="d-flex" role="search">
+            <input
+              class="form-control me-2"
+              type="search"
+              placeholder="Buscar"
+              aria-label="Search"
+            />
+            <button class="btn btn-outline-success" type="submit">
+              Buscar
+            </button>
+          </form>
+        </div>
+      </div>
+    </nav>
+    <!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Necesitas ayuda?
+  </button>
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Aistente virtual</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        <!--Aquí irá todo el chat entre bot y usuario-->
+            <div id="pantalla">
+
+            </div>
+        </div>
+        <div class="modal-footer">
+            <input type="text" placeholder="Escribir mensaje aquí" id="user_input">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button id="submit-button" class="btn btn-warning" type="submit" pys-onClick="llamarbot">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<py-script>
+
+import random
+import re
+
+
+def get_response(user_input):
+    split_message = re.split(r'\s|[,:;.?¿!-_]\s*',user_input.lower()) #Se separa el mensaje del usuario y se eliminan símbolos
+    response = check_all_messages(split_message)
+    return response
+    #Se definirá la función para calcular a través de probabilidades el mejor mensaje
+def message_probability(user_message,recognized_words,single_response=False,required_word=[] ):
+    message_certanly = 0
+    has_requiered_words = True
+    #Se procede a iterar las palabras del mensaje
+    for word in user_message:
+        #Se procede a detectar palabras reconocidas
+        if word in recognized_words:
+            message_certanly +=1
+            #Aumenta la probabilidad de encontrar una
+    percentage = float(message_certanly)/float(len(recognized_words) ) #Aquí se calcula el porcentaje de certeza de qué mensaje contestará en base a palabras clave
+    for word in required_word:
+        #Valida existencia de palabras requeridas en el mensaje
+        if word not in user_message:
+            has_requiered_words = False
+            break
+    if has_requiered_words or single_response:
+        return int(percentage * 100) #Devuelve el porcentaje multiplicado X 100 de cada respuesta
+    else:
+        return 0
+def check_all_messages(message):
+        highest_prob = {}
+        def response(bot_response,list_of_words,single_response = False,required_words = []):
+            nonlocal highest_prob
+            highest_prob[bot_response] = message_probability(message,list_of_words, single_response,required_words)
+        #casos de respuesta
+        response('Hola',['hola','ola','hi','buenas','saludos'],single_response = True)
+        response('Estoy bien y tu?',['como','estas','va','vas','sientes','cómo'],single_response=True) #required_words=['como'] esto es para palabras obligadas
+        response('Genial!, en qué te puedo ayudar?',['bien','excelente'],single_response = True)
+        response('Oh no!, en qué te puedo ayudar?',['mal','horrible','terrible'],single_response = True)
+        response('Estamos ubicados en Managua, Nicaragua',['ubicados','direccion','ubicado','lugar'],single_response=True)
+        response('Puedes contactarnos en el apartado de contacto de la página!',['correo','numero','gerente','empleado','personalizado','contacto','contactarlos',
+        'contactanos'],single_response = True)
+        response('Un placer estar a su servicio!',['gracias','te lo agradezco','thanks','adios'],single_response = True)
+        response('Puedes encontrar shorts en el apartado de productos y utilizando el filtro o con el buscador! :)',
+        ['shorts','pantalonsillos','corto','bermudas'],single_response = True)
+        response('Puedes encontrar gorras en el apartado de productos y utilizando el filtro o con el buscador! :)',
+        ['gorras','gorra','sombrero','cabeza','accesorio','accesorios'],single_response = True)
+        response('Puedes encontrar camisas en el apartado de productos y utilizando el filtro o con el buscador! :)',
+        ['camisas','camisa','camiseta','camisetas','polo','polos','manga larga','manga'],single_response = True)
+        response('Me llamo Codenaut Bot :) Soy una IA creada por Codenaut',['quién','quien','eres','ia','cómo','llamas','nombre','cual'],single_response=True)
+        response('Somos una tienda de ropa comprometida con la calidad y experiencia hacia nuestros clientes, somos Beachy!, si quieres saber más por favor dirigiete a la pestaña de Quienes somos?',
+        ['quienes','son','beachy','objetivo'],single_response=True)
+        best_match = max(highest_prob, key=highest_prob.get)
+        #Hprint(highest_prob)
+        return unknown() if highest_prob[best_match] < 1 else best_match
+def unknown():
+    #Este es un caso para cuando no encuentra qué contestar
+    response = ['Puedes decirlo de nuevo?','No estoy seguro de lo que quieres :(','No conozco la respuesta :('][random.randrange(3)]
+    return response
+    
+def llamarbot(*args, **kwargs):
+    texto = Element('user_input').element.value
+    pyscript.write('pantalla',"Bot :"+ get_response(texto))
+    #print("Bot :"+ get_response(input('You :')))
+</py-script>
+
+  </body>
+</html>
